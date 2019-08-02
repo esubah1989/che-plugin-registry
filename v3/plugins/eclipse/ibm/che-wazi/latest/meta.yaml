@@ -1,0 +1,57 @@
+apiVersion: v2
+publisher: ibm
+name: che-wazi
+version: latest
+type: Che Editor
+displayName: ZDE
+title: ZDE development version.
+description: ZDE, get the latest release each day.
+icon: https://raw.githubusercontent.com/theia-ide/theia/master/logo/theia-logo-no-text-black.svg?sanitize=true
+category: Editor
+repository: https://github.com/eclipse/che-theia
+firstPublicationDate: "2019-07-24"
+spec:
+  endpoints:
+    - name: "ZDE"
+      public: true
+      targetPort: 3000
+      attributes:
+        protocol: http
+        type: ide
+        secure: true
+        cookiesAuthEnabled: true
+        discoverable: false
+  containers:
+    - name: wazi-ide
+      image: sys-zowe-ext-docker-local.artifactory.swg-devops.com/n/zde:20190712-115300
+      env:
+        - name: THEIA_PLUGINS
+          value: local-dir:///plugins
+        - name: HOSTED_PLUGIN_HOSTNAME
+          value: 0.0.0.0
+        - name: HOSTED_PLUGIN_PORT
+          value: 3000
+      volumes:
+         - mountPath: "/home/zde/.theia"
+           name: zde          
+         - mountPath: "/plugins"
+           name: plugins        
+      mountSources: true
+      ports:
+        - exposedPort: 3000
+      commands:
+        - name: home-permission
+          workingDir: /home
+          command:
+            - chmod
+            - -R
+            - ugo+rw
+            - /home
+        - name: opt-permission
+          workingDir: /opt
+          command:
+            - chmod
+            - -R
+            - ugo+rw
+            - /opt
+      memoryLimit: "5136M"
